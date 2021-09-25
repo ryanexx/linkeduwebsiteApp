@@ -4,13 +4,8 @@ var jwt = require('jwt-simple');
 var moment = require('moment');
 var secret = 'clave_secreta_del_para_registros_votos_concejales';
 var mongoose = require('mongoose');
-var User = require('../models/user')
-
-
 async function getUser(userId) {
-
 	try {
-
 		var exist = await User.findOne({ $and: [{ _id: userId }, { active: true }] }).exec()
 			.then((userUp) => {
 				return userUp;
@@ -19,23 +14,16 @@ async function getUser(userId) {
 				// @ts-ignore
 				return handleError(err)
 			});
-
 		return exist
-
 	} catch (error) {
 		console.log(error)
 	}
-
 }
-
 exports.ensureAuth = async function (req, res, next) {
-
 	if (!req.headers.authorization) {
 		return res.status(403).send({ message: 'La petición no tiene la cabecera de autenticación' });
 	}
-
 	var token = req.headers.authorization.replace(/['"]+/g, ''); //obtener el token y si el token tiene comillas quitarlas
-
 	try {
 		var payload = jwt.decode(token, secret);
 		var userId = payload.sub
@@ -55,12 +43,9 @@ exports.ensureAuth = async function (req, res, next) {
 			message: 'El token no es válido'
 		});
 	}
-
 	//en los controladores se tiene acceso a req.user
 	//y se tiene los datos del usuario q está enviando el token
 	req.user = payload;
-
 	//saltar a lo siguiente, a ejecutar node
 	next();
-
 };
